@@ -1,0 +1,139 @@
+---
+title: "Practice 1"
+author: "Spencer Andries"
+date: "2026-06-17"
+output: word_document
+---
+
+```{r setup, echo = TRUE, include=TRUE, results = "markup", message = FALSE, warning = FALSE}
+
+
+library(palmerpenguins)
+library(tidyverse)
+library(class)
+
+######################
+# Prepare Data
+######################
+# Number of observations and variables
+dim(penguins)
+# Summary statistics
+summary(penguins)
+
+#Show number of NA
+colSums(is.na(penguins))
+
+#Creating new data set of only needed columns and drop rows where used columns are NA
+penguins_clean <- penguins %>%
+  select(species, bill_length_mm, flipper_length_mm) %>%
+  drop_na()
+#Show number of NA in clean data set
+colSums(is.na(penguins_clean))
+
+#######################
+# Data Exploration
+#######################
+
+# Number of observations and variables
+dim(penguins_clean)
+
+# Variable types
+str(penguins_clean)
+
+# Summary statistics
+summary(penguins_clean)
+
+# Summary table
+species_summary <- penguins_clean %>%
+  group_by(species) %>%
+  summarise(
+    Mean_Bill = round(mean(bill_length_mm),1),
+    SD_Bill = round(sd(bill_length_mm),1),
+    Mean_Flipper = round(mean(flipper_length_mm),1),
+    SD_Flipper = round(sd(flipper_length_mm),1),
+    n = n()
+  )
+
+species_summary
+
+# Unknown specimen
+unknown <- data.frame(
+  bill_length_mm = 45,
+  flipper_length_mm = 220
+)
+
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+##########################
+# Visualization
+##########################
+
+p <- ggplot(penguins_clean,
+       aes(x = bill_length_mm,
+           y = flipper_length_mm,
+           color = species)) +
+  geom_point(size = 3, alpha = 0.7) +
+  geom_point(data = unknown,
+             aes(x = bill_length_mm,
+                 y = flipper_length_mm),
+             color = "black",
+             shape = 8,
+             size = 6,
+             inherit.aes = FALSE) +
+  labs(
+    title = "Penguin Measurements by Species",
+    subtitle = "Unknown specimen shown as black star",
+    x = "Bill Length (mm)",
+    y = "Flipper Length (mm)",
+    color = "Species"
+  ) +
+  theme_minimal()
+p
+
+###################################
+# KNN Classification
+###################################
+
+#creating new df with only predictor variables 
+x_train <- penguins_clean %>%
+  select(bill_length_mm, flipper_length_mm)
+
+#creates dependent variable
+species <- penguins_clean$species
+
+# Standardize measurements to make bill and flipper link are weighted the same in the model
+x_all <- rbind(x_train, unknown)
+
+x_scaled <- scale(x_all)
+
+#separating the data back out, so train is the original penguins and the unknown pengion is seperate
+train_scaled <- x_scaled[1:nrow(x_train), ]
+test_scaled <- x_scaled[nrow(x_scaled), , drop = FALSE]
+
+# KNN classification
+k <- 15
+
+prediction <- knn(
+  train = train_scaled,
+  test = test_scaled,
+  cl = species,
+  k = k,
+  prob = TRUE
+)
+#gives predicition on which penguin the specimen belongs to
+prediction
+
+# Confidence estimate
+confidence <- attr(prediction, "prob")
+#returns that 15 of the 15 nearest neighbors were gentoo
+confidence
+
+cat("Predicted Species:", as.character(prediction), "\n")
+cat("Classification Confidence:", round(confidence * 100, 1), "%\n")
+
+
+```
+
+
