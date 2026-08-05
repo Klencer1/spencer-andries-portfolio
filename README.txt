@@ -1,12 +1,6 @@
 SPENCER ANDRIES DATA SCIENCE PORTFOLIO
 
-READY TO PUBLISH
-
-1. Open index.html in a browser to preview the website.
-2. The attached résumé is included as resume.pdf.
-3. Email, LinkedIn, and GitHub links are connected.
-4. Replace each project href="#" with a GitHub repository, PDF report, or project page as those materials become available.
-5. Publish through GitHub Pages by uploading all files to the repository root and enabling Pages from the main branch.
+This portfolio is designed to showcase my skills that I have learned through out my time in my Statistical Data Science program
 
 FILES
 - index.html: Website content and structure
